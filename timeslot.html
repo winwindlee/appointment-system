@@ -18,13 +18,13 @@
                 <th></th>
                 <th>09-10 星期三</th>
                 <th>09-11 星期四</th>
-                <th>09-12 星期五</th>
-                <th>09-13 星期六</th>
-                <th>09-14 星期日</th>
-                <th>09-15 星期一</th>
-                <th>09-16 星期二</th>
-                <th>09-17 星期三</th>
-                <th>09-18 星期四</th>
+                <td>09-12 星期五</td>
+                <td>09-13 星期六</td>
+                <td>09-14 星期日</td>
+                <td>09-15 星期一</td>
+                <td>09-16 星期二</td>
+                <td>09-17 星期三</td>
+                <td>09-18 星期四</td>
             </tr>
         </thead>
         <tbody>
@@ -37,7 +37,7 @@
                 <td id="cell2_5">可预约</td>
                 <td>约满</td>
                 <td id="cell2_7">可预约</td>
-                <td>约满</td>
+                <td id="cell2_8">约满</td>
             </tr>
             <tr>
                 <td>下午</td>
@@ -54,29 +54,68 @@
     </table>
 
     <script>
-        // 每秒检查是否整点（用于演示，实际应根据服务器时间）
-        setInterval(() => {
-            const now = new Date();
-            if (now.getSeconds() === 0) {
-                // 在第2、3行最后一列添加可点击链接（模拟准点出现）
-                const cells = [
-                    document.getElementById('cell2_8'), // 第2行最后列
-                    document.getElementById('cell3_8')  // 第3行最后列
-                ];
-                cells.forEach(cell => {
-                    if (!cell.querySelector('a')) {
-                        const link = document.createElement('a');
-                        link.textContent = '立即预约';
-                        link.href = 'javascript:void(0)';
-                        link.onclick = () => {
-                            window.location.href = 'confirm.html';
-                        };
-                        cell.innerHTML = '';
-                        cell.appendChild(link);
-                    }
-                });
+        /*
+         Configurable behavior:
+         - 修改下面的 targetTimeISO 为你希望触发“可预约”出现的时间点（ISO 格式或空字符串表示禁用自动触发）
+         - 修改 timeLabel 为你想显示的时间点信息（会作为 a 标签的 title，链接文本固定为 '余'）
+         - 修改 checkIntervalMs 调整检查频率（毫秒）
+         行为：当当前时间 >= targetTime 后（或当 targetTimeISO 留空且手动调用 triggerAvailability()），
+         在表格最后一列的第2行或第3行中随机选择一个单元格，显示一个超链接（文本 '余'），点击后跳转到 confirm.html。
+        */
+
+        const CONFIG = {
+            // 设置触发时间（ISO 字符串，例如 '2025-10-16T14:30:00'）。设置为空字符串则不会自动触发。
+            targetTimeISO: '2025-10-16T14:30:00',
+            // 可预约的时间点（仅作为 title 提示展示，可按需修改）
+            timeLabel: '13:30',
+            // 检查间隔（毫秒）
+            checkIntervalMs: 1000
+        };
+
+        // 内部标记，确保只触发一次
+        window.__availabilityTriggered = window.__availabilityTriggered || false;
+
+        function triggerAvailability() {
+            if (window.__availabilityTriggered) return;
+            window.__availabilityTriggered = true;
+
+            const candidates = [
+                document.getElementById('cell2_8'), // 第2行最后列
+                document.getElementById('cell3_8')  // 第3行最后列
+            ].filter(Boolean);
+
+            if (candidates.length === 0) {
+                console.warn('No candidate cells found for availability.');
+                return;
             }
-        }, 1000);
+
+            // 随机选择一个单元格
+            const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+            // 如果单元格已有链接则跳过
+            if (chosen.querySelector('a')) return;
+
+            chosen.innerHTML = '';
+            const a = document.createElement('a');
+            a.textContent = '余';
+            a.href = 'confirm.html';
+            a.title = CONFIG.timeLabel || '';
+            chosen.appendChild(a);
+        }
+
+        // 自动触发逻辑
+        if (CONFIG.targetTimeISO) {
+            const targetTime = new Date(CONFIG.targetTimeISO);
+            const timer = setInterval(() => {
+                const now = new Date();
+                if (now >= targetTime) {
+                    clearInterval(timer);
+                    triggerAvailability();
+                }
+            }, CONFIG.checkIntervalMs);
+        }
+
+        // 也提供一个全局函数，方便在控制台手动触发（或用于调试）
+        window.triggerAvailability = triggerAvailability;
     </script>
 </body>
 </html>
