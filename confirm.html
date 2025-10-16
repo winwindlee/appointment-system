@@ -6,13 +6,13 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
         .section { margin-bottom: 20px; }
-        #Image1 { font-weight: bold; font-size: 24px; background: #eee; padding: 5px; letter-spacing: 5px; }
-    .time-options { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
-    .time-option { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; border: 1px solid #eee; border-radius: 4px; }
-    .time-option input { margin-bottom: 6px; }
-    .time-option label { display: block; }
-    .disabled { color: red; cursor: not-allowed; }
-    .enabled { color: blue; cursor: pointer; }
+        #Image1 { display: inline-block; width: 100px; height: 40px; background: #eee; border: 1px solid #ccc; vertical-align: middle; }
+        .time-options { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+        .time-option { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; border: 1px solid #eee; border-radius: 4px; }
+        .time-option input { margin-bottom: 6px; }
+        .time-option label { display: block; }
+        .disabled { color: red; cursor: not-allowed; }
+        .enabled { color: blue; cursor: pointer; }
         button { padding: 8px 16px; }
     </style>
 </head>
@@ -23,7 +23,7 @@
     <div class="section">
         <label>图形验证：</label>
         <input type="text" id="txtTxYz" placeholder="请输入验证码">
-        <span id="Image1">IfWz</span>
+        <canvas id="Image1" width="100" height="40"></canvas>
         <a href="javascript:void(0)" id="LinkButton1">点此刷新验证码</a>
     </div>
 
@@ -42,20 +42,69 @@
     </div>
 
     <script>
-        // 刷新验证码
-        document.getElementById('LinkButton1').addEventListener('click', function() {
+        // 存储当前验证码文本，用于校验
+        let currentCaptcha = '';
+
+        // 生成随机验证码文本
+        function generateCaptcha() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let code = '';
             for (let i = 0; i < 4; i++) {
                 code += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            document.getElementById('Image1').textContent = code;
+            return code;
+        }
+
+        // 在 Canvas 上绘制验证码
+        function drawCaptcha(text) {
+            const canvas = document.getElementById('Image1');
+            const ctx = canvas.getContext('2d');
+
+            // 清空画布
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 设置字体
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#000';
+
+            // 绘制字符（逐个添加偏移，模拟扭曲效果）
+            for (let i = 0; i < text.length; i++) {
+                const x = 10 + i * 20 + Math.random() * 5 - 2.5; // 水平偏移
+                const y = 30 + Math.random() * 5 - 2.5;          // 垂直偏移
+                ctx.fillText(text[i], x, y);
+            }
+
+            // 添加干扰线
+            for (let i = 0; i < 5; i++) {
+                ctx.strokeStyle = `hsl(${Math.random()*360}, 50%, 50%)`;
+                ctx.beginPath();
+                ctx.moveTo(Math.random()*100, Math.random()*40);
+                ctx.lineTo(Math.random()*100, Math.random()*40);
+                ctx.stroke();
+            }
+
+            // 添加噪点
+            for (let i = 0; i < 30; i++) {
+                ctx.fillStyle = `hsl(${Math.random()*360}, 50%, 50%)`;
+                ctx.fillRect(Math.random()*100, Math.random()*40, 2, 2);
+            }
+        }
+
+        // 刷新验证码
+        document.getElementById('LinkButton1').addEventListener('click', function() {
+            currentCaptcha = generateCaptcha();
+            drawCaptcha(currentCaptcha);
         });
+
+        // 初始化时生成验证码
+        currentCaptcha = generateCaptcha();
+        drawCaptcha(currentCaptcha);
 
         // 提交按钮逻辑
         document.getElementById('btnConfirm').addEventListener('click', function() {
             const captcha = document.getElementById('txtTxYz').value.trim().toLowerCase();
-            const correctCaptcha = document.getElementById('Image1').textContent.toLowerCase();
+            const correctCaptcha = currentCaptcha.toLowerCase();
 
             if (captcha !== correctCaptcha) {
                 alert('验证码错误');
@@ -80,10 +129,16 @@
             selected.classList.remove('enabled');
             selected.classList.add('disabled');
             const lab = document.querySelector(`label[for="${selected.id}"]`);
-            if (lab) { lab.classList.remove('enabled'); lab.classList.add('disabled'); }
+            if (lab) {
+                lab.classList.remove('enabled');
+                lab.classList.add('disabled');
+            }
+
             // 更新剩余计数
             const remEl = document.getElementById('remainingCount');
-            if (remEl) remEl.textContent = Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length;
+            if (remEl) {
+                remEl.textContent = Array.from(document.getElementsByName('time')).filter(i => !i.disabled).length;
+            }
 
             // 成功跳转
             window.location.href = 'success.html';
@@ -94,7 +149,10 @@
             const container = document.getElementById('timeOptionsContainer');
             const total = 32;
             const startHour = 13, startMinute = 30;
-            function pad(n){ return n.toString().padStart(2,'0'); }
+
+            function pad(n) {
+                return n.toString().padStart(2, '0');
+            }
 
             // 初始全部标为可用（也可根据需要预设部分禁用）
             for (let i = 0; i < total; i++) {
@@ -110,12 +168,11 @@
                 input.type = 'radio';
                 input.name = 'time';
                 input.id = `RadioButton${i}`;
+                input.className = 'enabled';
 
                 const label = document.createElement('label');
                 label.htmlFor = input.id;
                 label.textContent = timeLabel;
-
-                input.className = 'enabled';
                 label.className = 'enabled';
 
                 div.appendChild(input);
@@ -124,39 +181,47 @@
             }
 
             // 剩余计数更新函数
-            function updateRemaining(){
-                const rem = Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length;
+            function updateRemaining() {
+                const rem = Array.from(document.getElementsByName('time')).filter(i => !i.disabled).length;
                 const el = document.getElementById('remainingCount');
-                if(el) el.textContent = rem;
+                if (el) el.textContent = rem;
                 return rem;
             }
 
             // 在 totalDuration 内把所有可选项随机逐步禁用
-            function startReduction(totalDurationMs){
-                const enabledElems = () => Array.from(document.getElementsByName('time')).filter(i=>!i.disabled);
+            function startReduction(totalDurationMs) {
+                const enabledElems = () => Array.from(document.getElementsByName('time')).filter(i => !i.disabled);
                 let remaining = updateRemaining();
-                if(remaining === 0) return;
+                if (remaining === 0) return;
+
                 // 计划禁用次数等于当前可用数量
                 const toDisable = remaining;
                 // 每次禁用的间隔
                 const interval = Math.max(50, Math.floor(totalDurationMs / toDisable));
 
-                const timer = setInterval(()=>{
+                const timer = setInterval(() => {
                     const candidates = enabledElems();
-                    if(candidates.length === 0){
+                    if (candidates.length === 0) {
                         clearInterval(timer);
                         return;
                     }
+
                     // 随机选择一个并禁用
                     const chosen = candidates[Math.floor(Math.random() * candidates.length)];
                     chosen.disabled = true;
                     chosen.classList.remove('enabled');
                     chosen.classList.add('disabled');
+
                     const lab = document.querySelector(`label[for="${chosen.id}"]`);
-                    if(lab){ lab.classList.remove('enabled'); lab.classList.add('disabled'); }
+                    if (lab) {
+                        lab.classList.remove('enabled');
+                        lab.classList.add('disabled');
+                    }
+
                     updateRemaining();
+
                     // 如果已经禁完，停止
-                    if(Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length === 0){
+                    if (Array.from(document.getElementsByName('time')).filter(i => !i.disabled).length === 0) {
                         clearInterval(timer);
                     }
                 }, interval);
