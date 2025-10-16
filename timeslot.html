@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>选择时间</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        a { color: blue; text-decoration: underline; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>可预约信息为</h2>
+    <table id="GridView1">
+        <thead>
+            <tr>
+                <th></th>
+                <th>09-10 星期三</th>
+                <th>09-11 星期四</th>
+                <th>09-12 星期五</th>
+                <th>09-13 星期六</th>
+                <th>09-14 星期日</th>
+                <th>09-15 星期一</th>
+                <th>09-16 星期二</th>
+                <th>09-17 星期三</th>
+                <th>09-18 星期四</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>上午</td>
+                <td>约满</td>
+                <td>约满</td>
+                <td id="cell2_3">可预约</td>
+                <td id="cell2_4">可预约</td>
+                <td id="cell2_5">可预约</td>
+                <td>约满</td>
+                <td id="cell2_7">可预约</td>
+                <td>约满</td>
+            </tr>
+            <tr>
+                <td>下午</td>
+                <td id="cell3_2">可预约</td>
+                <td id="cell3_3">可预约</td>
+                <td id="cell3_4">可预约</td>
+                <td id="cell3_5">可预约</td>
+                <td>约满</td>
+                <td id="cell3_6">可预约</td>
+                <td id="cell3_7">可预约</td>
+                <td id="cell3_8">可预约</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // 每秒检查是否整点（用于演示，实际应根据服务器时间）
+        setInterval(() => {
+            const now = new Date();
+            if (now.getSeconds() === 0) {
+                // 在第2、3行最后一列添加可点击链接（模拟准点出现）
+                const cells = [
+                    document.getElementById('cell2_8'), // 第2行最后列
+                    document.getElementById('cell3_8')  // 第3行最后列
+                ];
+                cells.forEach(cell => {
+                    if (!cell.querySelector('a')) {
+                        const link = document.createElement('a');
+                        link.textContent = '立即预约';
+                        link.href = 'javascript:void(0)';
+                        link.onclick = () => {
+                            window.location.href = 'confirm.html';
+                        };
+                        cell.innerHTML = '';
+                        cell.appendChild(link);
+                    }
+                });
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

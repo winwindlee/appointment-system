@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>确认预约</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin-bottom: 20px; }
+        #Image1 { font-weight: bold; font-size: 24px; background: #eee; padding: 5px; letter-spacing: 5px; }
+        .time-option { margin: 5px; }
+        .disabled { color: red; cursor: not-allowed; }
+        .enabled { color: blue; cursor: pointer; }
+        button { padding: 8px 16px; }
+    </style>
+</head>
+<body>
+    <h2>请完成预约确认</h2>
+
+    <!-- 第一部分：验证码 -->
+    <div class="section">
+        <label>图形验证：</label>
+        <input type="text" id="txtTxYz" placeholder="请输入验证码">
+        <span id="Image1">IfWz</span>
+        <a href="javascript:void(0)" id="LinkButton1">点此刷新验证码</a>
+    </div>
+
+    <!-- 第二部分：时间选择 -->
+    <div class="section" id="Panel1">
+        <h3>选择预约时间</h3>
+        <div class="time-options">
+            <!-- 模拟多个时间选项 -->
+            <div class="time-option"><input type="radio" id="RadioButton0" name="time" class="enabled"><label for="RadioButton0">13:30</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton1" name="time" class="enabled"><label for="RadioButton1">13:37</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton2" name="time" class="enabled"><label for="RadioButton2">13:44</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton3" name="time" class="disabled" disabled><label for="RadioButton3">13:51</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton4" name="time" class="disabled" disabled><label for="RadioButton4">13:58</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton5" name="time" class="enabled"><label for="RadioButton5">14:05</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton6" name="time" class="enabled"><label for="RadioButton6">14:12</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton7" name="time" class="enabled"><label for="RadioButton7">14:19</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton8" name="time" class="disabled" disabled><label for="RadioButton8">14:26</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton9" name="time" class="enabled"><label for="RadioButton9">14:33</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton10" name="time" class="enabled"><label for="RadioButton10">14:40</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton11" name="time" class="enabled"><label for="RadioButton11">14:47</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton12" name="time" class="enabled"><label for="RadioButton12">14:54</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton13" name="time" class="enabled"><label for="RadioButton13">15:01</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton14" name="time" class="enabled"><label for="RadioButton14">15:08</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton15" name="time" class="enabled"><label for="RadioButton15">15:15</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton16" name="time" class="enabled"><label for="RadioButton16">15:22</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton17" name="time" class="enabled"><label for="RadioButton17">15:29</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton18" name="time" class="enabled"><label for="RadioButton18">15:36</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton19" name="time" class="enabled"><label for="RadioButton19">15:43</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton20" name="time" class="enabled"><label for="RadioButton20">15:50</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton21" name="time" class="enabled"><label for="RadioButton21">15:57</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton22" name="time" class="enabled"><label for="RadioButton22">16:04</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton23" name="time" class="enabled"><label for="RadioButton23">16:11</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton24" name="time" class="enabled"><label for="RadioButton24">16:18</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton25" name="time" class="enabled"><label for="RadioButton25">16:25</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton26" name="time" class="enabled"><label for="RadioButton26">16:32</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton27" name="time" class="enabled"><label for="RadioButton27">16:39</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton28" name="time" class="enabled"><label for="RadioButton28">16:46</label></div>
+            <div class="time-option"><input type="radio" id="RadioButton29" name="time" class="enabled"><label for="RadioButton29">16:53</label></div>
+        </div>
+    </div>
+
+    <!-- 第三部分：提交按钮 -->
+    <div class="section">
+        <button id="btnConfirm">提交</button>
+    </div>
+
+    <script>
+        // 刷新验证码
+        document.getElementById('LinkButton1').addEventListener('click', function() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('Image1').textContent = code;
+        });
+
+        // 提交按钮逻辑
+        document.getElementById('btnConfirm').addEventListener('click', function() {
+            const captcha = document.getElementById('txtTxYz').value.trim().toLowerCase();
+            const correctCaptcha = document.getElementById('Image1').textContent.toLowerCase();
+
+            if (captcha !== correctCaptcha) {
+                alert('验证码错误');
+                return;
+            }
+
+            // 检查是否选中了可用时间
+            const selected = document.querySelector('input[name="time"]:checked');
+            if (!selected) {
+                alert('请先选择一个时间');
+                return;
+            }
+
+            // 检查是否选中了禁用项
+            if (selected.classList.contains('disabled')) {
+                alert('当前选择的时间不可用');
+                return;
+            }
+
+            // 成功跳转
+            window.location.href = 'success.html';
+        });
+    </script>
+</body>
+</html>

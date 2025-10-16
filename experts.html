@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>专家列表</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .expert-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .expert-item { padding: 10px; border: 1px solid #ddd; text-align: center; cursor: pointer; }
+        .expert-item:hover { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h2>请选择专家</h2>
+    <div class="expert-grid" id="expertList"></div>
+
+    <script>
+        // 随机生成专家名（含“张三”）
+        const names = [
+            "张三", "李四", "王五", "赵六", "钱七",
+            "孙八", "周九", "吴十", "郑十一", "冯十二"
+        ];
+
+        const expertList = document.getElementById('expertList');
+        names.forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'expert-item';
+            div.textContent = name;
+            div.addEventListener('click', () => {
+                window.location.href = 'timeslot.html';
+            });
+            expertList.appendChild(div);
+        });
+    </script>
+</body>
+</html>
