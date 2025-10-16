@@ -30,6 +30,7 @@
     <!-- 第二部分：时间选择 -->
     <div class="section" id="Panel1">
         <h3>选择预约时间</h3>
+        <div style="margin-bottom:8px">剩余可选时间：<span id="remainingCount">0</span></div>
         <div class="time-options" id="timeOptionsContainer">
             <!-- 将由脚本动态生成 4 行 x 8 列 的时间选项 -->
         </div>
@@ -74,22 +75,28 @@
                 return;
             }
 
+            // 在跳转前把所选时间立即设为不可用，模拟抢占成功后的锁定
+            selected.disabled = true;
+            selected.classList.remove('enabled');
+            selected.classList.add('disabled');
+            const lab = document.querySelector(`label[for="${selected.id}"]`);
+            if (lab) { lab.classList.remove('enabled'); lab.classList.add('disabled'); }
+            // 更新剩余计数
+            const remEl = document.getElementById('remainingCount');
+            if (remEl) remEl.textContent = Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length;
+
             // 成功跳转
             window.location.href = 'success.html';
         });
 
-        // 动态生成 4 行 x 8 列 时间选项（共 32 个）
-        (function generateTimeOptions() {
+        // 动态生成 4 行 x 8 列 时间选项（共 32 个），并在生成后启动 2 分钟内逐步将可选项随机设为不可选
+        (function generateTimeOptionsAndStartReduction() {
             const container = document.getElementById('timeOptionsContainer');
-            // 样式通过 CSS 控制为 4x8，从而自动换行
-            // 我们从 13:30 开始，每个选项间隔 7 分钟（可按需调整）
             const total = 32;
             const startHour = 13, startMinute = 30;
             function pad(n){ return n.toString().padStart(2,'0'); }
 
-            // 设定被禁用的索引（示例：每 4 个禁用一个）
-            const disabledIdx = new Set([3,7,11,15,19,23,27,31]);
-
+            // 初始全部标为可用（也可根据需要预设部分禁用）
             for (let i = 0; i < total; i++) {
                 const minutes = startHour * 60 + startMinute + i * 7;
                 const hh = Math.floor(minutes / 60) % 24;
@@ -108,19 +115,55 @@
                 label.htmlFor = input.id;
                 label.textContent = timeLabel;
 
-                if (disabledIdx.has(i)) {
-                    input.className = 'disabled';
-                    input.disabled = true;
-                    label.className = 'disabled';
-                } else {
-                    input.className = 'enabled';
-                    label.className = 'enabled';
-                }
+                input.className = 'enabled';
+                label.className = 'enabled';
 
                 div.appendChild(input);
                 div.appendChild(label);
                 container.appendChild(div);
             }
+
+            // 剩余计数更新函数
+            function updateRemaining(){
+                const rem = Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length;
+                const el = document.getElementById('remainingCount');
+                if(el) el.textContent = rem;
+                return rem;
+            }
+
+            // 在 totalDuration 内把所有可选项随机逐步禁用
+            function startReduction(totalDurationMs){
+                const enabledElems = () => Array.from(document.getElementsByName('time')).filter(i=>!i.disabled);
+                let remaining = updateRemaining();
+                if(remaining === 0) return;
+                // 计划禁用次数等于当前可用数量
+                const toDisable = remaining;
+                // 每次禁用的间隔
+                const interval = Math.max(50, Math.floor(totalDurationMs / toDisable));
+
+                const timer = setInterval(()=>{
+                    const candidates = enabledElems();
+                    if(candidates.length === 0){
+                        clearInterval(timer);
+                        return;
+                    }
+                    // 随机选择一个并禁用
+                    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+                    chosen.disabled = true;
+                    chosen.classList.remove('enabled');
+                    chosen.classList.add('disabled');
+                    const lab = document.querySelector(`label[for="${chosen.id}"]`);
+                    if(lab){ lab.classList.remove('enabled'); lab.classList.add('disabled'); }
+                    updateRemaining();
+                    // 如果已经禁完，停止
+                    if(Array.from(document.getElementsByName('time')).filter(i=>!i.disabled).length === 0){
+                        clearInterval(timer);
+                    }
+                }, interval);
+            }
+
+            // 启动 2 分钟（120000 ms）内逐步禁用所有可选项
+            startReduction(120000);
         })();
     </script>
 </body>
