@@ -7,9 +7,12 @@
         body { font-family: Arial, sans-serif; padding: 20px; }
         .section { margin-bottom: 20px; }
         #Image1 { font-weight: bold; font-size: 24px; background: #eee; padding: 5px; letter-spacing: 5px; }
-        .time-option { margin: 5px; }
-        .disabled { color: red; cursor: not-allowed; }
-        .enabled { color: blue; cursor: pointer; }
+    .time-options { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+    .time-option { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; border: 1px solid #eee; border-radius: 4px; }
+    .time-option input { margin-bottom: 6px; }
+    .time-option label { display: block; }
+    .disabled { color: red; cursor: not-allowed; }
+    .enabled { color: blue; cursor: pointer; }
         button { padding: 8px 16px; }
     </style>
 </head>
