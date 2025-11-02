@@ -23,7 +23,7 @@
         document.getElementById('Button1').addEventListener('click', function() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            if (username === 'admin' && password === '123123') {
+            if ((username === 'admin1' && password === '123123') || (username === 'admin2' && password === '123123')) {
                 window.location.href = 'experts.html';
             } else {
                 alert('账号或密码错误');
