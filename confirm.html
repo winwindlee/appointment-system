@@ -14,6 +14,7 @@
         .disabled { color: red; cursor: not-allowed; }
         .enabled { color: blue; cursor: pointer; }
         button { padding: 8px 16px; }
+        .abc { color: red; font-size: 14px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -25,6 +26,7 @@
         <input type="text" id="txtTxYz" placeholder="请输入验证码">
         <canvas id="Image1" width="100" height="40"></canvas>
         <a href="javascript:void(0)" id="LinkButton1">点此刷新验证码</a>
+        <div id="div1" class="abc" style="display: none;">请输入正确的验证码.</div>
     </div>
 
     <!-- 第二部分：时间选择 -->
@@ -95,11 +97,18 @@
         document.getElementById('LinkButton1').addEventListener('click', function() {
             currentCaptcha = generateCaptcha();
             drawCaptcha(currentCaptcha);
+            // 刷新验证码时清除错误提示
+            document.getElementById('div1').style.display = 'none';
         });
 
         // 初始化时生成验证码
         currentCaptcha = generateCaptcha();
         drawCaptcha(currentCaptcha);
+
+        // 验证码输入框输入时清除错误提示
+        document.getElementById('txtTxYz').addEventListener('input', function() {
+            document.getElementById('div1').style.display = 'none';
+        });
 
         // 提交按钮逻辑
         document.getElementById('btnConfirm').addEventListener('click', function() {
@@ -107,9 +116,13 @@
             const correctCaptcha = currentCaptcha.toLowerCase();
 
             if (captcha !== correctCaptcha) {
-                alert('验证码错误');
+                // 显示错误提示
+                document.getElementById('div1').style.display = 'block';
                 return;
             }
+
+            // 验证码正确，隐藏错误提示
+            document.getElementById('div1').style.display = 'none';
 
             // 检查是否选中了可用时间
             const selected = document.querySelector('input[name="time"]:checked');
@@ -228,7 +241,7 @@
             }
 
             // 启动 2 分钟（120000 ms）内逐步禁用所有可选项
-            startReduction(10000);
+            startReduction(30000);
         })();
     </script>
 </body>
