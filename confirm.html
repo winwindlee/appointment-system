@@ -26,7 +26,7 @@
         <input type="text" id="txtTxYz" placeholder="请输入验证码">
         <canvas id="Image1" width="100" height="40"></canvas>
         <a href="javascript:void(0)" id="LinkButton1">点此刷新验证码</a>
-        <div id="div1" class="abc" style="display: none;">请输入正确的验证码.</div>
+        <div id="div1" class="abc"></div>
     </div>
 
     <!-- 第二部分：时间选择 -->
@@ -93,21 +93,15 @@
             }
         }
 
-        // 刷新验证码
+        // 保存初始验证码
+        const initialCaptcha = generateCaptcha();
+        currentCaptcha = initialCaptcha;
+        drawCaptcha(currentCaptcha);
+
+        // 刷新验证码（不清除错误提示）
         document.getElementById('LinkButton1').addEventListener('click', function() {
             currentCaptcha = generateCaptcha();
             drawCaptcha(currentCaptcha);
-            // 刷新验证码时清除错误提示
-            document.getElementById('div1').style.display = 'none';
-        });
-
-        // 初始化时生成验证码
-        currentCaptcha = generateCaptcha();
-        drawCaptcha(currentCaptcha);
-
-        // 验证码输入框输入时清除错误提示
-        document.getElementById('txtTxYz').addEventListener('input', function() {
-            document.getElementById('div1').style.display = 'none';
         });
 
         // 提交按钮逻辑
@@ -116,18 +110,24 @@
             const correctCaptcha = currentCaptcha.toLowerCase();
 
             if (captcha !== correctCaptcha) {
-                // 显示错误提示
-                document.getElementById('div1').style.display = 'block';
+                // 随机显示两种错误提示之一
+                const errorMessages = ['请输入正确的验证码', '图形验证码不正确或者已过期'];
+                const randomMessage = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                document.getElementById('div1').innerHTML = randomMessage;
+                
+                // 恢复到初始验证码
+                currentCaptcha = initialCaptcha;
+                drawCaptcha(currentCaptcha);
                 return;
             }
 
-            // 验证码正确，隐藏错误提示
-            document.getElementById('div1').style.display = 'none';
+            // 验证码正确，清除错误提示
+            document.getElementById('div1').innerHTML = '';
 
             // 检查是否选中了可用时间
             const selected = document.querySelector('input[name="time"]:checked');
             if (!selected) {
-                alert('请先选择一个时间');
+                alert('请选择您要预约的时间点.');
                 return;
             }
 
