@@ -46,6 +46,7 @@
     <script>
         // 存储当前验证码文本，用于校验
         let currentCaptcha = '';
+        let captchaGeneratedTime = 0; // 记录验证码生成时间
 
         // 生成随机验证码文本
         function generateCaptcha() {
@@ -96,11 +97,13 @@
         // 保存初始验证码
         const initialCaptcha = generateCaptcha();
         currentCaptcha = initialCaptcha;
+        captchaGeneratedTime = Date.now();
         drawCaptcha(currentCaptcha);
 
         // 刷新验证码（不清除错误提示）
         document.getElementById('LinkButton1').addEventListener('click', function() {
             currentCaptcha = generateCaptcha();
+            captchaGeneratedTime = Date.now(); // 更新生成时间
             drawCaptcha(currentCaptcha);
         });
 
@@ -108,15 +111,22 @@
         document.getElementById('btnConfirm').addEventListener('click', function() {
             const captcha = document.getElementById('txtTxYz').value.trim().toLowerCase();
             const correctCaptcha = currentCaptcha.toLowerCase();
+            
+            // 检查验证码是否过期（超过1分钟，即60000毫秒）
+            const currentTime = Date.now();
+            const isExpired = (currentTime - captchaGeneratedTime) > 60000;
 
             if (captcha !== correctCaptcha) {
-                // 随机显示两种错误提示之一
-                const errorMessages = ['请输入正确的验证码', '图形验证码不正确或者已过期'];
-                const randomMessage = errorMessages[Math.floor(Math.random() * errorMessages.length)];
-                document.getElementById('div1').innerHTML = randomMessage;
+                // 根据是否过期显示不同的错误提示
+                if (isExpired) {
+                    document.getElementById('div1').innerHTML = '图形验证码不正确或者已过期.';
+                } else {
+                    document.getElementById('div1').innerHTML = '请输入正确的验证码.';
+                }
                 
                 // 恢复到初始验证码
                 currentCaptcha = initialCaptcha;
+                captchaGeneratedTime = Date.now(); // 重置时间
                 drawCaptcha(currentCaptcha);
                 return;
             }
@@ -127,7 +137,7 @@
             // 检查是否选中了可用时间
             const selected = document.querySelector('input[name="time"]:checked');
             if (!selected) {
-                alert('请选择您要预约的时间点.');
+                alert('请先选择一个时间');
                 return;
             }
 
@@ -241,7 +251,7 @@
             }
 
             // 启动 2 分钟（120000 ms）内逐步禁用所有可选项
-            startReduction(30000);
+            startReduction(10000);
         })();
     </script>
 </body>
